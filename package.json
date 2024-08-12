@@ -1,0 +1,45 @@
+{
+  "name": "jcorp-rest-api-boilerplate",
+  "version": "1.0.0",
+  "description": "this is boilerplate for express rest api with advance usage",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meassamrong/jcorp-rest-api-boilerplate.git"
+  },
+  "keywords": [
+    "Express",
+    "rest-api",
+    "API",
+    "Server"
+  ],
+  "author": "meassamrong",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meassamrong/jcorp-rest-api-boilerplate/issues"
+  },
+  "homepage": "https://github.com/meassamrong/jcorp-rest-api-boilerplate#readme",
+  "dependencies": {
+    "axios": "^1.7.3",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-async-handler": "^1.2.0",
+    "express-validator": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.2",
+    "morgan": "^1.10.0",
+    "path": "^0.12.7",
+    "rotating-file-stream": "^3.2.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
