@@ -136,4 +136,125 @@ const userLoginValidator = checkSchema({
         }
     }
 });
-module.exports = { creatUserValidator, userLoginValidator }
+const profileByIdValidator = checkSchema({
+    id: {
+        isLength: {
+            options: {
+                max: 24,
+                min: 24
+            },
+            errorMessage: "invalid user id!"
+        }
+    }
+})
+const updateUserDataValidation = checkSchema({
+    email: {
+        optional: {
+            options: { checkFalsy: true } // Allow empty strings but still validate if provided
+        },
+        isEmail: {
+            errorMessage: 'Invalid email address',
+        },
+        custom: {
+            options: async (value) => {
+                if (value) {
+                    const ifEmailExists = await checkEmailIfExists(value);
+                    if (ifEmailExists && ifEmailExists.email !== value) {
+                        throw new Error("email is already in used!");
+                    }
+                }
+            }
+        }
+    },
+    username: {
+        optional: {
+            options: { checkFalsy: true } // Allow empty strings but still validate if provided
+        },
+        custom: {
+            options: async (value) => {
+                if (value) {
+                    const checkifUsernameIsExists = await checkifUsernameIsExist(value);
+                    if (checkifUsernameIsExists && checkifUsernameIsExists.username !== value) {
+                        throw new Error("username is already used!");
+                    }
+                }
+            }
+        }
+    },
+    fullname: {
+        optional: {
+            options: { checkFalsy: true } // Allow empty strings but still validate if provided
+        },
+        isLength: {
+            options: {
+                min: 3,
+                max: 32
+            },
+            errorMessage: 'Name must be between 3 and 32 characters'
+        },
+        errorMessage: 'Name is required'
+    },
+    tel: {
+        optional: {
+            options: { checkFalsy: true } // Allow empty strings but still validate if provided
+        },
+        isString: true,
+        errorMessage: 'Phone Number must be provided!',
+        custom: {
+            options: async value => {
+                const nineDigitRegex = /^\d{9}$/; // Regular expression for 9-digit phone number
+                const tenDigitRegex = /^\d{10}$/; // Regular expression for 10-digit phone number
+                if (nineDigitRegex.test(value) || tenDigitRegex.test(value)) {
+                    return true;
+                } {
+                    throw new Error("Invalid phone number format");
+                }
+            }
+        }
+    },
+    roles: {
+        optional: {
+            options: { checkFalsy: true } // Allow empty strings but still validate if provided
+        },
+        custom: {
+            options: async value => {
+                if (!typeof value === 'array') throw new Error("Role must be a array");
+                if (value.length < 1) throw new Error("At least one role is required!");
+            }
+        }
+    },
+    password: {
+        optional: {
+            options: { checkFalsy: true } // Allow empty strings but still validate if provided
+        },
+        isLength: {
+            options: {
+                max: 30,
+                min: 6
+            },
+            errorMessage: "Password length must be 20 characters maximum and 3 characters minimum."
+        }
+    },
+    confirmedPassword: {
+        optional: {
+            options: { checkFalsy: true } // Allow empty strings but still validate if provided
+        },
+        isLength: {
+            options: {
+                max: 30,
+                min: 6
+            },
+            errorMessage: "Password length must be 20 characters maximum and 3 characters minimum."
+        },
+        custom: {
+            options: async (value, { req }) => {
+                if (value != req.body.password) {
+                    throw new Error("Password mismatched!")
+                }
+            }
+        }
+    }
+
+})
+
+module.exports = { creatUserValidator, userLoginValidator, profileByIdValidator, updateUserDataValidation }
