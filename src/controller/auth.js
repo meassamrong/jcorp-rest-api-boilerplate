@@ -41,7 +41,65 @@ const userLogin = (async (req, res) => {
         }
         const jwtToken = signToken(userSignature);
         return res.status(200).json({ error: false, messsage: 'successfully signed', token: jwtToken });
-    } catch (error) {
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: true, messsage: "Internal server error!" });
+    }
+});
+// user update self-profile
+const updateSelfProfile = (async(req, res) => {
+    try{
+        const selfId = req.users.id.id;
+        const profileData = req.body;
+        if(profileData._id) delete profileData._id;
+        const updateNewProfile = await userModel.findByIdAndUpdate(selfId, profileData, {new : true});
+        if(updateNewProfile){
+            updateNewProfile.password = '';
+            res.status(200).json({error : false, message: "profile update successfully!", detail: updateNewProfile})
+        }else {
+            res.status(404).json({error: true, message : 'something went wrong!'})
+        }
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({ error: true, messsage: "Internal server error!" });
+    }
+});
+// get my profile
+const getMyProfile = (async (req, res) => {
+    try {
+        const { id } = req.users;
+        const myProfile = await userModel.findById(id.id);
+        if (myProfile) {
+            myProfile.password = '';
+            res.status(200).json({ error: false, profile: myProfile });
+        } else {
+            res.status(404).json({ error: true, message: 'Someting went wrong with this profile!' });
+        }
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: true, messsage: "Internal server error!" });
+    }
+});
+// self profile remove
+const selfRemove = (async (req, res) => {
+    try {
+        const { id } = req.users;
+        const password = req.body.password;
+        const checkUserId = await userModel.findById(id.id);
+        if(checkUserId ) {
+            const passwordIsMatch = await bcrypt.compare(password, checkUserId.password);
+            if(!passwordIsMatch) return res.status(401).json({error: true, message : "Incorrect Password!"});
+            const deleteProfile = await userModel.findByIdAndDelete(id.id);
+            if (deleteProfile) {
+                res.status(200).json({ error: false, messages: "User deleted successfully!" });
+            } else {
+                res.status(404).json({ error: true, message: "User Couldn't be found!" });
+        }
+        }else{
+                return res.status(401).json({error: true, message : "User Couldn't be found"});
+            }
+    } catch (err) {
+        console.log(err);
         return res.status(500).json({ error: true, messsage: "Internal server error!" });
     }
 });
@@ -60,41 +118,18 @@ const removeUser = (async (req, res) => {
         return res.status(500).json({ error: true, messsage: "Internal server error!" });
     }
 });
-// self profile remove
-const selfRemove = (async (req, res) => {
-    try {
-        const { id } = req.users;
-        const deleteProfile = await userModel.findByIdAndDelete(id.id);
-        if(deleteProfile) {
-            res.status(200).json({ error: false, messages: "User deleted successfully!" });
-        }else {
-            res.status(404).json({error : true, message : "User Couldn't be found!"});
-        }
-    }catch(err) {
-        console.log(err);
-        return res.status(500).json({ error: true, messsage: "Internal server error!" });
-    }
-});
+// update user profile
 const updateUser = (async (req, res) => {
     try {
-        const userId  = req.query.id
-        const userData = req.body
-        console.log(userId, userData);
-    }catch (err){
-        console.log(err);
-        return res.status(500).json({ error: true, messsage: "Internal server error!" });
-    }
-});
-// get my profile
-const getMyProfile = (async (req, res) => {
-    try {
-        const { id } = req.users;
-        const myProfile = await userModel.findById(id.id);
-        if (myProfile) {
-            myProfile.password = '';
-            res.status(200).json({ error: false, profile: myProfile });
-        } else {
-            res.status(404).json({ error: true, message: 'Someting went wrong with this profile!' });
+        const userId = req.query.id
+        const userData = req.body;
+        if(userData._id) delete profileData._id;
+        const updateUser = await userModel.findByIdAndUpdate(userId, userData, { new: true })
+        if (updateUser) {
+            updateUser.password = ''
+            res.status(200).json({ error: false, message: "Update user profile successfully", details: updateUser })
+        }else {
+            res.status(404).json({error: true, message : 'something went wrong!'})
         }
     } catch (err) {
         console.log(err);
@@ -121,6 +156,7 @@ const getAllUsers = async (req, res) => {
     try {
         const users = await userModel.find();
         if (users) {
+            users.forEach((user) => {user.password = ""})
             res.status(200).json({ error: false, users: users });
         } else {
             res.status(200).json({ error: false, messages: "No users found!" });
@@ -130,4 +166,4 @@ const getAllUsers = async (req, res) => {
         return res.status(500).json({ error: true, messsage: "Internal server error!" });
     }
 }
-module.exports = { createUser, userLogin, removeUser, selfRemove, updateUser, getMyProfile, getAllUsers, getUserById }
+module.exports = { createUser, userLogin, updateSelfProfile, removeUser, selfRemove, updateUser, getMyProfile, getAllUsers, getUserById }
