@@ -18,7 +18,7 @@
 
 ## Features
 
-This is a NestJS boilerplate code with preconfigured libraries and packages with the following features:
+This is a NodeJS boilerplate code with preconfigured libraries and packages with the following features:
 
 - One-click setup with [Docker](https://www.docker.com/)
 - [None-SQL] project build with [MONGODB](https://mongodb.org) by default.
